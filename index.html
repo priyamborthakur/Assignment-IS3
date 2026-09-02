@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOLTERRA: ENERGY PROTOCOL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&family=Share+Tech+Mono&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- TOP HUD -->
+        <header id="game-header">
+            <div class="hud-left">
+                <span class="title-brand">VOLTERRA</span>
+                <span class="level-indicator">LEVEL 1 // TIER 2-ROW GRID</span>
+            </div>
+            <div class="hud-center">
+                <div class="hud-stat">SIM TIME: <span id="ui-timer">0.0s</span></div>
+                <div class="hud-stat">TARGET STABILITY: <span id="ui-target-time">5.0s</span></div>
+            </div>
+            <div class="hud-right">
+                <button id="btn-thermal-toggle" class="btn-secondary">THERMAL VISION: OFF</button>
+                <button id="btn-open-log" class="btn-secondary">THEORY LOGBOOK</button>
+                <div class="status-indicator" id="status-ind">SYSTEM: STANDBY</div>
+            </div>
+        </header>
+
+        <main id="main-interface">
+            <!-- LEFT PANEL: Component Depot & Diagnostic Multimeter -->
+            <aside id="left-panel" class="panel">
+                <div class="panel-section rack-section">
+                    <h2>COMPONENT RACK (RIGHT-CLICK AUTOPSY)</h2>
+                    <div id="inventory-list" class="inventory-grid drop-zone"></div>
+                </div>
+
+                <div class="panel-section diagnostics-section">
+                    <h2>DIAGNOSTIC MULTIMETER</h2>
+                    <div class="multimeter-chassis">
+                        <div class="multimeter-screen">
+                            <div class="screen-mode" id="mm-mode-label">DC VOLTS</div>
+                            <div class="screen-readout" id="mm-display">--.-- V</div>
+                        </div>
+                        <div class="multimeter-controls">
+                            <button id="btn-mm-mode" class="btn-toggle">MODE: VOLTAGE</button>
+                            <button id="btn-toggle-mm" class="btn-primary">PROBES: STOWED</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- CENTER PANEL: Circuit Routing Matrix & Visualizer Canvas -->
+            <section id="workspace-panel" class="panel">
+                <div class="workspace-header">
+                    <h2>CIRCUIT ROUTING MATRIX</h2>
+                    <div class="circuit-legend">
+                        <span><span class="dot wire-dot"></span> Conductor</span>
+                        <span><span class="dot alkaline-dot"></span> Alkaline (1.5A Max)</span>
+                        <span><span class="dot liion-dot"></span> Li-Ion (5.0A Max)</span>
+                    </div>
+                </div>
+
+                <div id="canvas-container">
+                    <canvas id="circuit-canvas"></canvas>
+                    <div id="circuit-board"></div>
+                </div>
+
+                <!-- LIVE OSCILLOSCOPE MONITOR -->
+                <div class="oscilloscope-container">
+                    <div class="oscope-label">OSCILLOSCOPE WAVEFORM (V-SAG)</div>
+                    <canvas id="oscope-canvas"></canvas>
+                </div>
+
+                <div class="workspace-footer">
+                    <div class="pack-metrics">
+                        <span>System OCV: <strong id="pack-ocv">0.00 V</strong></span> |
+                        <span>Equivalent Res: <strong id="pack-res">0.00 Ω</strong></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT PANEL: Specifications & Real-time Telemetry -->
+            <aside id="mission-panel" class="panel">
+                <h2>LOAD SPECIFICATIONS</h2>
+                <div class="spec-card">
+                    <div class="spec-row">
+                        <span>Min Target Volts:</span>
+                        <strong class="highlight-target" id="target-v">-- V</strong>
+                    </div>
+                    <div class="spec-row">
+                        <span>Required Current:</span>
+                        <strong class="highlight-load" id="target-load">-- A</strong>
+                    </div>
+                </div>
+
+                <h2>REAL-TIME TELEMETRY</h2>
+                <div class="telemetry-card">
+                    <div class="telemetry-row">
+                        <span>Operating Volts:</span>
+                        <span id="op-voltage" class="telemetry-focus">0.00 V</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span>Thermal Status:</span>
+                        <span id="thermal-status" class="status-safe">NOMINAL</span>
+                    </div>
+                </div>
+
+                <div class="action-dock">
+                    <button id="btn-run-sim" class="btn-action btn-run">ENGAGE BUS SWITCH</button>
+                    <button id="btn-reset" class="btn-action btn-reset">CLEAR MATRIX</button>
+                    <button id="btn-next-level" class="btn-action btn-next" style="display: none;">NEXT SCENARIO</button>
+                </div>
+
+                <div id="console-output" class="console">
+                    <span class="prompt">&gt;</span> System ready. Awaiting circuit topology.
+                </div>
+            </aside>
+        </main>
+
+        <!-- AUTOPSY MODAL WINDOW -->
+        <div id="autopsy-modal" class="modal-backdrop">
+            <div class="modal-window">
+                <div class="modal-header">
+                    <h3>CELL AUTOPSY DIAGNOSTIC REPORT</h3>
+                    <button id="btn-close-autopsy" class="btn-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="autopsy-details" id="autopsy-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- THEORY LOGBOOK MODAL WINDOW -->
+        <div id="log-modal" class="modal-backdrop">
+            <div class="modal-window">
+                <div class="modal-header">
+                    <h3>VOLTERRA LABORATORY MANUAL</h3>
+                    <button id="btn-close-log" class="btn-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="log-grid">
+                        <div class="log-card">
+                            <h4>Current Ratings & Surges</h4>
+                            <p>Watch out for dynamic surge events during active simulations! Surges spike the required load mid-run. Build parallel rows to absorb current spikes.</p>
+                        </div>
+                        <div class="log-card">
+                            <h4>Cell Autopsy Inspection</h4>
+                            <p>Right-click any battery card in the inventory rack to access its internal electrode X-ray analysis, structural integrity, and electrolyte health.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+</html>
